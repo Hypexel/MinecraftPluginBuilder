@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Minecraft Plugin Editor</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.14/codemirror.min.css">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+    #editor {
+      height: 400px;
+      border: 1px solid #ccc;
+    }
+    .container {
+      padding: 20px;
+    }
+    button {
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Minecraft Plugin Editor</h1>
+    <textarea id="editor"></textarea>
+    <br>
+    <button onclick="saveCode()">Download Plugin</button>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.14/codemirror.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.14/mode/java/java.min.js"></script>
+  <script>
+    // Initialize CodeMirror
+    const editor = CodeMirror.fromTextArea(document.getElementById('editor'), {
+      mode: 'text/x-java',
+      lineNumbers: true,
+      theme: 'default',
+    });
+
+    // Function to save and download the plugin
+    function saveCode() {
+      const code = editor.getValue();
+      const blob = new Blob([code], { type: 'text/plain' });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = 'plugin.java';
+      link.click();
+    }
+  </script>
+</body>
+</html>
