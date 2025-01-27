@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spigot Plugin Builder</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <h1>Spigot Plugin Builder</h1>
+    <div id="plugin-config">
+        <h2>Plugin Configuration</h2>
+        <input id="plugin-name" placeholder="Plugin Name">
+        <input id="main-class" placeholder="Main Class">
+        <input id="plugin-version" placeholder="Version">
+        <input id="api-version" placeholder="API Version">
+    </div>
+
+    <div id="code-editor">
+        <h2>Code Editor</h2>
+        <textarea id="source-code" rows="15" placeholder="Write your plugin code here..."></textarea>
+    </div>
+
+    <div id="dependencies">
+        <h2>Dependencies</h2>
+        <input id="dependency" placeholder="Add Maven Dependency">
+        <button id="add-dependency">Add</button>
+        <ul id="dependency-list"></ul>
+    </div>
+
+    <button id="build-plugin">Build Plugin</button>
+
+    <script src="js/app.js"></script>
+</body>
+</html>
