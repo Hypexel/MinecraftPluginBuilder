@@ -1,12 +1,20 @@
 {
-  "name": "minecraft-plugin-builder",
+  "name": "spigot-plugin-builder",
   "version": "1.0.0",
-  "main": "server.js",
+  "description": "A web-based tool to create, edit, and build Minecraft Spigot plugins.",
+  "main": "backend/index.js",
   "scripts": {
-    "start": "node server.js"
+    "start": "node backend/index.js",
+    "dev": "nodemon backend/index.js"
   },
+  "keywords": ["minecraft", "spigot", "plugin", "builder", "web"],
+  "author": "Xuez_Gaming",
+  "license": "MIT",
   "dependencies": {
-    "express": "^4.18.2",
-    "body-parser": "^1.20.2"
+    "cors": "^2.8.5",
+    "express": "^4.18.2"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.22"
   }
 }
