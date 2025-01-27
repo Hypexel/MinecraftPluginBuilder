@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Minecraft Plugin Editor</title>
+  <title>Minecraft Plugin Builder</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.14/codemirror.min.css">
   <style>
     body {
@@ -11,21 +11,42 @@
       margin: 0;
       padding: 0;
     }
+    .container {
+      padding: 20px;
+    }
     #editor {
       height: 400px;
       border: 1px solid #ccc;
     }
-    .container {
-      padding: 20px;
+    .project-options, .editor-options {
+      margin-bottom: 20px;
+    }
+    .hidden {
+      display: none;
     }
     button {
-      margin-top: 10px;
+      margin-top: 5px;
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <h1>Minecraft Plugin Editor</h1>
+    <h1>Minecraft Plugin Builder</h1>
+    <div class="project-options">
+      <button onclick="newProject()">New Project</button>
+      <label for="version">Minecraft Version:</label>
+      <select id="version" onchange="updateVersion()">
+        <option value="1.20">1.20</option>
+        <option value="1.19">1.19</option>
+        <option value="1.18">1.18</option>
+        <option value="1.17">1.17</option>
+      </select>
+    </div>
+    <div class="editor-options">
+      <button onclick="addPackage()">Add Package</button>
+      <button onclick="addClass()">Add Class</button>
+    </div>
+    <div id="project-tree"></div>
     <textarea id="editor"></textarea>
     <br>
     <button onclick="saveCode()">Download Plugin</button>
@@ -34,6 +55,9 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.14/codemirror.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.14/mode/java/java.min.js"></script>
   <script>
+    let currentProject = null;
+    let minecraftVersion = '1.20';
+
     // Initialize CodeMirror
     const editor = CodeMirror.fromTextArea(document.getElementById('editor'), {
       mode: 'text/x-java',
@@ -41,13 +65,70 @@
       theme: 'default',
     });
 
-    // Function to save and download the plugin
+    function newProject() {
+      const projectName = prompt("Enter the new project name:");
+      if (projectName) {
+        currentProject = { name: projectName, packages: {} };
+        document.getElementById('project-tree').innerHTML = `<strong>Project: ${projectName}</strong>`;
+        alert("New project created: " + projectName);
+      }
+    }
+
+    function updateVersion() {
+      minecraftVersion = document.getElementById('version').value;
+      alert("Minecraft version set to: " + minecraftVersion);
+    }
+
+    function addPackage() {
+      if (!currentProject) {
+        alert("Create a project first!");
+        return;
+      }
+      const packageName = prompt("Enter the package name:");
+      if (packageName) {
+        currentProject.packages[packageName] = {};
+        const tree = document.getElementById('project-tree');
+        tree.innerHTML += `<div><strong>Package:</strong> ${packageName}</div>`;
+      }
+    }
+
+    function addClass() {
+      if (!currentProject) {
+        alert("Create a project first!");
+        return;
+      }
+      const packageName = prompt("Enter the package name to add the class to:");
+      if (packageName && currentProject.packages[packageName] !== undefined) {
+        const className = prompt("Enter the class name:");
+        if (className) {
+          currentProject.packages[packageName][className] = `package ${packageName};\n\npublic class ${className} {\n\n}`;
+          const tree = document.getElementById('project-tree');
+          tree.innerHTML += `<div>&nbsp;&nbsp;&nbsp;<strong>Class:</strong> ${className} in ${packageName}</div>`;
+        }
+      } else {
+        alert("Package not found!");
+      }
+    }
+
     function saveCode() {
-      const code = editor.getValue();
-      const blob = new Blob([code], { type: 'text/plain' });
+      if (!currentProject) {
+        alert("Create a project first!");
+        return;
+      }
+
+      let zipContent = "";
+      for (const packageName in currentProject.packages) {
+        for (const className in currentProject.packages[packageName]) {
+          zipContent += `File: ${packageName.replace(/\./g, "/")}/${className}.java\n`;
+          zipContent += currentProject.packages[packageName][className];
+          zipContent += "\n\n";
+        }
+      }
+
+      const blob = new Blob([zipContent], { type: 'text/plain' });
       const link = document.createElement('a');
       link.href = URL.createObjectURL(blob);
-      link.download = 'plugin.java';
+      link.download = `${currentProject.name}_MinecraftPlugin_${minecraftVersion}.zip`;
       link.click();
     }
   </script>
