@@ -6,30 +6,21 @@ const { exec } = require("child_process");
 
 const app = express();
 app.use(bodyParser.json());
-app.use(express.static("public"));
-
-// Temporary folder for projects
-const TEMP_DIR = "./projects";
-if (!fs.existsSync(TEMP_DIR)) fs.mkdirSync(TEMP_DIR);
 
 app.post("/build", (req, res) => {
-  const { projectName } = req.body;
-  const projectPath = path.join(TEMP_DIR, projectName);
-  const jarFilePath = path.join(TEMP_DIR, `${projectName}.jar`);
+  const { code, pluginName, version } = req.body;
 
-  if (!fs.existsSync(projectPath)) {
-    return res.status(400).send("Project not found.");
-  }
+  const projectPath = path.join(__dirname, "projects", pluginName);
+  if (!fs.existsSync(projectPath)) fs.mkdirSync(projectPath, { recursive: true });
 
-  exec(`javac -d ${projectPath} $(find ${projectPath} -name "*.java") && jar cf ${jarFilePath} -C ${projectPath} .`, (err) => {
-    if (err) {
-      console.error(err);
-      return res.status(500).send("Failed to build the plugin.");
-    }
-    res.download(jarFilePath, `${projectName}.jar`, () => {
-      fs.unlinkSync(jarFilePath);
-    });
+  const mainFile = path.join(projectPath, "Main.java");
+  fs.writeFileSync(mainFile, code);
+
+  const jarFile = path.join(__dirname, `${pluginName}.jar`);
+  exec(`javac ${mainFile} && jar cf ${jarFile} -C ${projectPath} .`, (err) => {
+    if (err) return res.status(500).send("Build failed.");
+    res.download(jarFile);
   });
 });
 
-app.listen(3000, () => console.log("Server running on http://localhost:3000"));
+app.listen(3000, () => console.log("Server running on port 3000"));
